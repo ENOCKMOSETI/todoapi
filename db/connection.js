@@ -13,6 +13,7 @@ if (process.env.NODE_ENV === 'production') {
                     rejectUnauthorized: false
                 }
             },
+            encrypt: true,
         }
     );
 }
