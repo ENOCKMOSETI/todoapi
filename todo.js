@@ -29,9 +29,7 @@ app.get('/todos', async (req, res) => {
     if (todos) {
         res.json(todos);
     } else {
-        res.status(404).json({
-            error: 'No active todos found',
-        });
+        res.send(404).status('No active todos found');
     }
 })
 
