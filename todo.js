@@ -22,6 +22,19 @@ app.post('/todos', async (req, res) => {
     });
 }});
 
+app.get('/todos', async (req, res) => {
+    const todos = await Todo.findAll({where: {
+        status: 'active',
+    }});
+    if (todos) {
+        res.json(todos);
+    } else {
+        res.status(404).json({
+            error: 'No active todos found',
+        });
+    }
+})
+
 app.get('/todos/all', async (req, res) => {
     const todo = await Todo.findAll();
     if (todo) {

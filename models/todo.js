@@ -27,6 +27,4 @@ const Todo = sequelize.define('todo', {
     }
 });
 
-Todo.sync({force: true});
-
 module.exports = Todo;
