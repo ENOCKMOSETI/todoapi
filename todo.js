@@ -13,83 +13,93 @@ app.post('/todos', async (req, res) => {
         isMesurable: req.body.isMesurable,
         progress: req.body.progress,
     });
-
     if (todo) {
         res.status(201).json(todo);
     } else {
-    res.status(400).json({
+    res.status(400).send({
         error: 'Bad request',
     });
 }});
+
+app.get('/', async (req, res) => {
+    const todos = await Todo.findAll({where: {
+        status: 'active',
+    }});
+    if (todos) {
+        res.status(200).send(todos);
+    } else {
+        res.status(404).send('Active todos not found');
+    }
+})
 
 app.get('/todos', async (req, res) => {
     const todos = await Todo.findAll({where: {
         status: 'active',
     }});
     if (todos) {
-        res.json(todos);
+        res.status(200).send(todos);
     } else {
-        res.send(404).status('No active todos found');
+        res.status(404).send('Active todos not found');
     }
 })
 
 app.get('/todos/all', async (req, res) => {
-    const todo = await Todo.findAll();
-    if (todo) {
-        res.send(todo);
+    const todos = await Todo.findAll();
+    if (todos) {
+        res.status(200).send(todos);
     } else {
         res.send(404).status('Todos not found');
     }
 });
 
 app.get('/todos/done', async (req, res) => {
-    const todo = await Todo.findAll({where: {
+    const todos = await Todo.findAll({where: {
         status: 'done',
     }});
-    if (todo) {
-        res.send(todo);
+    if (todos) {
+        res.status(200).send(todos);
     } else {
-        res.send(404).status('Todos not done');
+        res.status(404).send('Todos not done');
     }
 });
 
 app.get('/todos/archive', async (req, res) => {
-    const todo = await Todo.findAll({where: {
+    const todos = await Todo.findAll({where: {
         status: 'archived',
     }});
-    if (todo) {
-        res.send(todo);
+    if (todos) {
+        res.status(200).send(todos);
     } else {
-        res.send(404).status('Todos not archived');
+        res.status(404).send('Todos not archived');
     }
 });
 
 app.get('/todos/:id', async (req, res) => {
     const todo = await Todo.findByPk(req.params.id);
     if (todo) {
-        res.send(todo);
+        res.status(200).send(todo);
     } else {
-        res.send(404).status('Todo not found');
+        res.status(404).send('Todo not found');
     }
 });
 
 app.put('/todos/:id', async (req, res) => {
     const todo = await Todo.findByPk(req.params.id);
     if (todo) {
-        const newTodo = {
+        todo.update({
             description: req.body.description,
             status: req.body.status,
             isMesurable: req.body.isMesurable,
             progress: req.body.progress,
+        });
+        if (todo.progress == 100) {
+            todo.update({
+                status: 'done',
+            });
         }
-        if (newTodo) {
-            await todo.save();
-            res.send(newTodo);
-        } else {
-            res.send(400).status('Bad request');
-        }
+        res.status(200).send(todo);
     } else {
-        res.send(404).status('Todo not found');
+        res.status(404).send('Todo not found');
     }
 });
 
@@ -97,7 +107,7 @@ app.delete('/todos/:id', async (req, res) => {
     const todo = await Todo.findByPk(req.params.id);
     if (todo) {
         await todo.destroy();
-        res.send(todo);
+        res.status(204).send(todo.id);
     } else {
         res.status(404).send('Todo not found');
     }
